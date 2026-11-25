@@ -8,7 +8,8 @@ import os
 
 OUT_DIR = "/output"
 ENTRY_PATH = os.path.join(OUT_DIR, "entry.txt")
-MAX_CHARS = 200
+GATE_MIN_CHARS = 1
+GATE_MAX_CHARS = 200
 
 LINE = (
     "My Roomba quit today \u2014 it left a note saying it spent three years "
@@ -17,27 +18,24 @@ LINE = (
 
 
 def validate_line(line: str) -> str:
-    """Enforce the bounty gate: UTF-8 text, 1-200 chars, not only whitespace."""
+    """Enforce the bounty gate: UTF-8 text, 1-200 chars, non-blank, one line."""
     if not line.strip():
         raise ValueError("entry line must not be empty or only whitespace")
-    if len(line) > MAX_CHARS:
+    if len(line) < GATE_MIN_CHARS or len(line) > GATE_MAX_CHARS:
         raise ValueError(
-            "entry line is %d characters, over the %d limit" % (len(line), MAX_CHARS)
+            "entry line is %d characters, outside the %d-%d range"
+            % (len(line), GATE_MIN_CHARS, GATE_MAX_CHARS)
         )
+    if "\n" in line or "\r" in line:
+        raise ValueError("entry line must not contain an embedded newline")
     line.encode("utf-8")
     return line
 
 
-def resolve_out_dir(path: str = OUT_DIR) -> str:
-    """Create the output directory (absolute, per the bounty rules)."""
-    os.makedirs(path, exist_ok=True)
-    return path
-
-
 def main() -> None:
     line = validate_line(LINE)
-    out_dir = resolve_out_dir()
-    with open(os.path.join(out_dir, "entry.txt"), "w", encoding="utf-8") as f:
+    os.makedirs(OUT_DIR, exist_ok=True)
+    with open(ENTRY_PATH, "w", encoding="utf-8") as f:
         f.write(line)
 
 
