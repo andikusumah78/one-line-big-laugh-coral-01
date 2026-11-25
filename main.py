@@ -7,7 +7,7 @@ Pure standard library; deterministic; no network, no input files.
 import os
 
 OUT_DIR = "/output"
-ENTRY_PATH = os.path.join(OUT_DIR, "entry.txt")
+OUTPUT_ENTRY_PATH = os.path.join(OUT_DIR, "entry.txt")
 GATE_MIN_CHARS = 1
 GATE_MAX_CHARS = 200
 
@@ -18,7 +18,7 @@ LINE = (
 
 
 def validate_line(line: str) -> str:
-    """Enforce the bounty gate: UTF-8 text, 1-200 chars, non-blank, one line."""
+    """Gate check: the line must be non-blank, 1-200 chars, one line, valid UTF-8."""
     if not line.strip():
         raise ValueError("entry line must not be empty or only whitespace")
     if len(line) < GATE_MIN_CHARS or len(line) > GATE_MAX_CHARS:
@@ -35,7 +35,7 @@ def validate_line(line: str) -> str:
 def main() -> None:
     line = validate_line(LINE)
     os.makedirs(OUT_DIR, exist_ok=True)
-    with open(ENTRY_PATH, "w", encoding="utf-8") as f:
+    with open(OUTPUT_ENTRY_PATH, "w", encoding="utf-8") as f:
         f.write(line)
 
 
